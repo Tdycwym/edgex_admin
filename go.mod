@@ -11,6 +11,7 @@ require (
 	github.com/parnurzeal/gorequest v0.2.16 // indirect
 	github.com/satori/go.uuid v1.2.0
 	github.com/smartystreets/goconvey v1.6.4 // indirect
+	github.com/tencentcloud/tencentcloud-sdk-go v1.0.153
 	go.uber.org/zap v1.16.0
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
 	gopkg.in/ini.v1 v1.62.0 // indirect
