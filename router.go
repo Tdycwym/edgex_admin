@@ -2,11 +2,11 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/nju-iot/edgex_admin/handlers"
-	"github.com/nju-iot/edgex_admin/handlers/edgex"
-	"github.com/nju-iot/edgex_admin/handlers/user"
-	"github.com/nju-iot/edgex_admin/middleware/session"
-	"github.com/nju-iot/edgex_admin/resp"
+	"github.com/tydcwym/edgex_admin/handlers"
+	"github.com/tydcwym/edgex_admin/handlers/edgex"
+	"github.com/tydcwym/edgex_admin/handlers/user"
+	"github.com/tydcwym/edgex_admin/middleware/session"
+	"github.com/tydcwym/edgex_admin/resp"
 )
 
 func registerRouter(r *gin.Engine) {

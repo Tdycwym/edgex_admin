@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/nju-iot/edgex_admin/logs"
+	"github.com/tydcwym/edgex_admin/logs"
 )
 
 // JSONOutPutWrapper ...

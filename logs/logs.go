@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/natefinch/lumberjack"
-	"github.com/nju-iot/edgex_admin/config"
+	"github.com/tydcwym/edgex_admin/config"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )

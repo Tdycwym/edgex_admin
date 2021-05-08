@@ -3,8 +3,8 @@ package dal
 import (
 	"time"
 
-	"github.com/nju-iot/edgex_admin/caller"
-	"github.com/nju-iot/edgex_admin/logs"
+	"github.com/tydcwym/edgex_admin/caller"
+	"github.com/tydcwym/edgex_admin/logs"
 	"gorm.io/gorm"
 )
 

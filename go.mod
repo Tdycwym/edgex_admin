@@ -1,4 +1,4 @@
-module github.com/nju-iot/edgex_admin
+module github.com/tydcwym/edgex_admin
 
 go 1.15
 

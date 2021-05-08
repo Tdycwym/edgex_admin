@@ -4,12 +4,12 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/nju-iot/edgex_admin/caller"
-	"github.com/nju-iot/edgex_admin/dal"
-	"github.com/nju-iot/edgex_admin/logs"
-	"github.com/nju-iot/edgex_admin/middleware/session"
-	"github.com/nju-iot/edgex_admin/resp"
-	"github.com/nju-iot/edgex_admin/utils"
+	"github.com/tydcwym/edgex_admin/caller"
+	"github.com/tydcwym/edgex_admin/dal"
+	"github.com/tydcwym/edgex_admin/logs"
+	"github.com/tydcwym/edgex_admin/middleware/session"
+	"github.com/tydcwym/edgex_admin/resp"
+	"github.com/tydcwym/edgex_admin/utils"
 )
 
 type LoginParams struct {

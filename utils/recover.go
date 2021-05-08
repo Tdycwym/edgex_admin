@@ -3,7 +3,7 @@ package utils
 import (
 	"runtime/debug"
 
-	"github.com/nju-iot/edgex_admin/logs"
+	"github.com/tydcwym/edgex_admin/logs"
 )
 
 // RecoverPanic ...
