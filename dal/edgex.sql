@@ -1,5 +1,5 @@
 --
--- Database: tydcwym
+-- Database: tdycwym
 --
 
 -- DROP DATABASE IF EXISTS `nju_iot`;

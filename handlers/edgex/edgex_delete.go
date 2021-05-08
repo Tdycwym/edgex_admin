@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"github.com/tydcwym/edgex_admin/caller"
-	"github.com/tydcwym/edgex_admin/dal"
-	"github.com/tydcwym/edgex_admin/logs"
-	"github.com/tydcwym/edgex_admin/resp"
+	"github.com/tdycwym/edgex_admin/caller"
+	"github.com/tdycwym/edgex_admin/dal"
+	"github.com/tdycwym/edgex_admin/logs"
+	"github.com/tdycwym/edgex_admin/resp"
 )
 
 // DeleteEdgexParams ...

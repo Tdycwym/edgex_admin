@@ -5,13 +5,13 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/tydcwym/edgex_admin/constdef"
-	"github.com/tydcwym/edgex_admin/dal"
-	"github.com/tydcwym/edgex_admin/logs"
-	"github.com/tydcwym/edgex_admin/middleware/session"
-	"github.com/tydcwym/edgex_admin/model"
-	"github.com/tydcwym/edgex_admin/resp"
-	"github.com/tydcwym/edgex_admin/utils"
+	"github.com/tdycwym/edgex_admin/constdef"
+	"github.com/tdycwym/edgex_admin/dal"
+	"github.com/tdycwym/edgex_admin/logs"
+	"github.com/tdycwym/edgex_admin/middleware/session"
+	"github.com/tdycwym/edgex_admin/model"
+	"github.com/tdycwym/edgex_admin/resp"
+	"github.com/tdycwym/edgex_admin/utils"
 )
 
 const (

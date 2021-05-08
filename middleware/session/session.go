@@ -8,7 +8,7 @@ import (
 	"github.com/gin-contrib/sessions/redis"
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
-	"github.com/tydcwym/edgex_admin/config"
+	"github.com/tdycwym/edgex_admin/config"
 )
 
 type userInfo struct {

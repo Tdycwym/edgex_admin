@@ -6,15 +6,13 @@ import (
 
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
-	"github.com/tydcwym/edgex_admin/caller"
-	"github.com/tydcwym/edgex_admin/config"
-	"github.com/tydcwym/edgex_admin/logs"
+	"github.com/tdycwym/edgex_admin/caller"
+	"github.com/tdycwym/edgex_admin/config"
+	"github.com/tdycwym/edgex_admin/logs"
 
-	"github.com/tydcwym/edgex_admin/middleware/cors"
-	"github.com/tydcwym/edgex_admin/middleware/session"
+	"github.com/tdycwym/edgex_admin/middleware/cors"
+	"github.com/tdycwym/edgex_admin/middleware/session"
 	"go.uber.org/zap"
-
-	"github.com/tydcwym/edgex_admin/handlers/user"
 )
 
 func main() {

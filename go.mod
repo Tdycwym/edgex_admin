@@ -1,4 +1,4 @@
-module github.com/tydcwym/edgex_admin
+module github.com/tdycwym/edgex_admin
 
 go 1.15
 

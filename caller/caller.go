@@ -3,7 +3,7 @@ package caller
 import (
 	"fmt"
 
-	"github.com/tydcwym/edgex_admin/config"
+	"github.com/tdycwym/edgex_admin/config"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
