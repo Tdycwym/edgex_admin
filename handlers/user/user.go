@@ -1,6 +1,7 @@
 package user
 
 import (
+	"errors"
 	"fmt"
 	"math/rand"
 	"strconv"
@@ -76,12 +77,18 @@ type RegisterParams struct {
 	Email    string `form:"email" json:"email" binding:"required"`
 }
 
-type RegisterParams2 struct {
+type RegisterCheckParams struct {
 	Username string `form:"username" json:"username" binding:"required"`
 	Password string `form:"password" json:"password" binding:"required"`
 	Email    string `form:"email" json:"email" binding:"required"`
 	Code     string `form:"code" json:"code" binding:"required"`
 }
+type CodeChecker struct {
+	Email string
+	Code  string
+}
+
+var checker map[string]CodeChecker
 
 func Register(c *gin.Context) *resp.JSONOutput {
 	// Step1. 参数校验
@@ -106,16 +113,45 @@ func Register(c *gin.Context) *resp.JSONOutput {
 		return resp.SampleJSON(c, resp.RespCodeUserExsit, nil)
 	}
 
-	//Step3. 邮箱验证
+	//Step3. 发送邮箱验证码
+	mailTo := []string{params.Email}
+	subject := string("登录验证")
+	code := randomCode()
+	body := code
+	err = SendMailTo(mailTo, subject, body)
+	if err != nil {
+		return resp.SampleJSON(c, resp.RespCodeParamsError, "发送失败")
+	}
 
-	// Step4. 添加用户
+	var cc CodeChecker
+	cc.Email = params.Email
+	cc.Code = code
+	checker[params.Email] = cc
+	return resp.SampleJSON(c, resp.RespCodeSuccess, nil)
+}
+
+func RegisterCheck(c *gin.Context) *resp.JSONOutput {
+	params := &RegisterCheckParams{}
+	err := c.Bind(&params)
+	if err != nil {
+		logs.Error("[RegisterCheck] request-params error: params=%+v, err=%v", params, err)
+		return resp.SampleJSON(c, resp.RespCodeParamsError, nil)
+	}
+	//验证验证码
+	err = checkCode(params.Email, params.Code)
+	if err != nil {
+		logs.Error("[RegisterCheck] check-code error: params=%+v, err=%v", params, err)
+		return resp.SampleJSON(c, resp.RespCodeParamsError, nil)
+	}
+	//添加用户
 	user := &dal.EdgexUser{
 		Username:     params.Username,
 		Password:     params.Password,
+		Email:        params.Email,
 		CreatedTime:  time.Now(),
 		ModifiedTime: time.Now(),
 	}
-	dbErr = dal.AddEdgexUser(caller.EdgexDB, user)
+	dbErr := dal.AddEdgexUser(caller.EdgexDB, user)
 	if dbErr != nil {
 		return resp.SampleJSON(c, resp.RespDatabaseError, nil)
 	}
@@ -193,4 +229,19 @@ func randomCode() string {
 	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
 	vcode := fmt.Sprintf("%06v", rnd.Int31n(1000000))
 	return vcode
+}
+
+func checkCode(email string, code string) error {
+	if checker == nil {
+		checker = make(map[string]CodeChecker)
+		return errors.New("No email found!")
+	}
+	c, ok := checker[email]
+	if !ok {
+		return errors.New("No email found!")
+	}
+	if c.Code == code {
+		return nil
+	}
+	return errors.New("Wrong code!")
 }

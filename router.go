@@ -27,5 +27,6 @@ func registerRouter(r *gin.Engine) {
 		userRouter.POST("/login", session.SessionMiddleware(), resp.JSONOutPutWrapper(user.Login))
 		userRouter.GET("/logout", resp.JSONOutPutWrapper(user.Logout))
 		userRouter.POST("/test/email", resp.JSONOutPutWrapper(user.SendMail))
+		userRouter.POST("/registerCheck", resp.JSONOutPutWrapper(user.RegisterCheck))
 	}
 }
