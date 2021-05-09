@@ -260,8 +260,9 @@ func updateEntrypted(user_name string, entrypted string) error {
 }
 
 type EntryptedParams struct {
-	UserName  string `form:"user_name" json:"user_name"`
-	Entrypted string `form:"entrypted" json:"entrypted"`
+	UserName   string `form:"user_name" json:"user_name"`
+	QuestionId int    `form:"question_id" json:"question_id"`
+	Answer     string `form:"answer" json:"answer"`
 }
 
 func testUpdateUser(c *gin.Context) *resp.JSONOutput {
@@ -271,7 +272,9 @@ func testUpdateUser(c *gin.Context) *resp.JSONOutput {
 		logs.Error("[Register] request-params error: params=%+v, err=%v", params, err)
 		return resp.SampleJSON(c, resp.RespCodeParamsError, nil)
 	}
-	err = updateEntrypted(params.UserName, params.Entrypted)
+	var entrypted string
+	entrypted = fmt.Sprintf("%d %s", params.QuestionId, params.Answer)
+	err = updateEntrypted(params.UserName, entrypted)
 	if err != nil {
 		return resp.SampleJSON(c, resp.RespCodeParamsError, "更新失败")
 	}
