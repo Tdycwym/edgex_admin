@@ -259,23 +259,47 @@ func updateEntrypted(user_name string, entrypted string) error {
 	return err
 }
 
+func updatePassword(user_name string, password string) error {
+	var fieldsMap map[string]interface{} = map[string]interface{}{"password": password}
+	err := dal.UpdateEdgexUser(user_name, fieldsMap)
+	return err
+}
+
 type EntryptedParams struct {
 	UserName   string `form:"user_name" json:"user_name"`
 	QuestionId int    `form:"question_id" json:"question_id"`
 	Answer     string `form:"answer" json:"answer"`
 }
 
-func TestUpdateUser(c *gin.Context) *resp.JSONOutput {
+type PasswordParams struct {
+	UserName string `form:"user_name" json:"user_name"`
+	Password string `form:"password" json:"password"`
+}
+
+func UpdateUserEntrypted(c *gin.Context) *resp.JSONOutput {
 	params := &EntryptedParams{}
 	err := c.Bind(&params)
 	if err != nil {
 		logs.Error("[Register] request-params error: params=%+v, err=%v", params, err)
 		return resp.SampleJSON(c, resp.RespCodeParamsError, nil)
 	}
-	var entrypted string
-	entrypted = fmt.Sprintf("%d %s", params.QuestionId, params.Answer)
+	entrypted := fmt.Sprintf("%d %s", params.QuestionId, params.Answer)
 	err = updateEntrypted(params.UserName, entrypted)
 	if err != nil {
+		return resp.SampleJSON(c, resp.RespCodeParamsError, "更新失败")
+	}
+	return resp.SampleJSON(c, resp.RespCodeSuccess, nil)
+}
+
+func UpdateUserPassword(c *gin.Context) *resp.JSONOutput {
+	params := &PasswordParams{}
+	err := c.Bind(&params)
+	if err != nil {
+		logs.Error("[Register] request-params error: params=%+v, err=%v", params, err)
+		return resp.SampleJSON(c, resp.RespCodeParamsError, nil)
+	}
+	password := params.Password
+	if updateEntrypted(params.UserName, password) != nil {
 		return resp.SampleJSON(c, resp.RespCodeParamsError, "更新失败")
 	}
 	return resp.SampleJSON(c, resp.RespCodeSuccess, nil)

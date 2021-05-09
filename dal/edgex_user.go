@@ -78,7 +78,7 @@ func GetEdgexUserByEmail(email string) (user *EdgexUser, err error) {
 }
 
 func UpdateEdgexUser(user_name string, fieldsMap map[string]interface{}) error {
-	dbRes := caller.EdgexDB.Debug().Model(&EdgexRelatedUser{}).Where("username = ?", user_name).Updates(fieldsMap)
+	dbRes := caller.EdgexDB.Debug().Model(&EdgexUser{}).Where("username = ?", user_name).Updates(fieldsMap)
 	if dbRes.Error != nil {
 		logs.Error("[UpdateEdgexRelatedUser] update EdgexRelatedUser failed: username=%+v, filedsMap=%+v, err=%v", user_name, fieldsMap, dbRes.Error)
 		return dbRes.Error
