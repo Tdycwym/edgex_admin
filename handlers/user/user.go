@@ -123,6 +123,9 @@ func Register(c *gin.Context) *resp.JSONOutput {
 		return resp.SampleJSON(c, resp.RespCodeParamsError, "发送失败")
 	}
 
+	if checker == nil {
+		checker = make(map[string]CodeChecker)
+	}
 	var cc CodeChecker
 	cc.Email = params.Email
 	cc.Code = code
