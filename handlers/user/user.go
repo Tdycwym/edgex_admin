@@ -76,6 +76,13 @@ type RegisterParams struct {
 	Email    string `form:"email" json:"email" binding:"required"`
 }
 
+type RegisterParams2 struct {
+	Username string `form:"username" json:"username" binding:"required"`
+	Password string `form:"password" json:"password" binding:"required"`
+	Email    string `form:"email" json:"email" binding:"required"`
+	Code     string `form:"code" json:"code" binding:"required"`
+}
+
 func Register(c *gin.Context) *resp.JSONOutput {
 	// Step1. 参数校验
 	params := &RegisterParams{}
