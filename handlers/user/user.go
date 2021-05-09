@@ -237,14 +237,43 @@ func randomCode() string {
 func checkCode(email string, code string) error {
 	if checker == nil {
 		checker = make(map[string]CodeChecker)
-		return errors.New("No email found!")
+		return errors.New("no email found")
 	}
 	c, ok := checker[email]
 	if !ok {
-		return errors.New("No email found!")
+		return errors.New("no email found")
 	}
 	if c.Code == code {
 		return nil
 	}
-	return errors.New("Wrong code!")
+	return errors.New("wrong code")
+}
+
+func setEntryptedQuestions(questionCode int, user_id int64, answer string) {
+
+}
+
+func updateEntrypted(user_name string, entrypted string) error {
+	var fieldsMap map[string]interface{} = map[string]interface{}{"entrypted": entrypted}
+	err := dal.UpdateEdgexUser(user_name, fieldsMap)
+	return err
+}
+
+type EntryptedParams struct {
+	UserName  string `form:"user_name" json:"user_name"`
+	Entrypted string `form:"entrypted" json:"entrypted"`
+}
+
+func testUpdateUser(c *gin.Context) *resp.JSONOutput {
+	params := &EntryptedParams{}
+	err := c.Bind(&params)
+	if err != nil {
+		logs.Error("[Register] request-params error: params=%+v, err=%v", params, err)
+		return resp.SampleJSON(c, resp.RespCodeParamsError, nil)
+	}
+	err = updateEntrypted(params.UserName, params.Entrypted)
+	if err != nil {
+		return resp.SampleJSON(c, resp.RespCodeParamsError, "更新失败")
+	}
+	return resp.SampleJSON(c, resp.RespCodeSuccess, nil)
 }
