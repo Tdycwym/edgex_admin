@@ -87,7 +87,7 @@ func Register(c *gin.Context) *resp.JSONOutput {
 
 	// Step2. 查看用户/邮箱是否存在
 	userInfo, dbErr := dal.GetEdgexUserByName(params.Username)
-	// mailInfo, dbErr2 := dal.GetEdgexUserByEmail(params.Email)
+	mailInfo, dbErr2 := dal.GetEdgexUserByEmail(params.Email)
 	if dbErr != nil {
 		logs.Error("[Register] get user failed: username=%s, err=%v", params.Username, dbErr)
 		return resp.SampleJSON(c, resp.RespDatabaseError, nil)
