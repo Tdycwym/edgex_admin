@@ -85,6 +85,8 @@ CREATE TABLE `edgex_user` (
 	`phone_number` varchar (200) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '电话号码',
 	`email` varchar (200) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '邮箱',
 	`deleted` tinyint NOT NULL DEFAULT '0' COMMENT '0-未删除 1-已删除',
+	`verified` tinyint NOT NULL DEFAULT '0' COMMENT '0-未验证 1-已验证',
+	`entrypted` varchar(255) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '密码保护问题',
 	`created_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `modified_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),

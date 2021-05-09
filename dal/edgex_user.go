@@ -16,6 +16,7 @@ type EdgexUser struct {
 	PhoneNumber  string    `gorm:"column:phone_number" json:"phone_number"`
 	Email        string    `gorm:"column:email" json:"email"`
 	Deleted      int32     `gorm:"column:deleted" json:"deleted"`
+	Entrypted    string    `gorm:"column:entrypted" json:"entrypted"`
 	CreatedTime  time.Time `gorm:"column:created_time" json:"created_time"`
 	ModifiedTime time.Time `gorm:"column:modified_time" json:"modified_time"`
 }

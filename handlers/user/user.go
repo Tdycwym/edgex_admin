@@ -1,6 +1,9 @@
 package user
 
 import (
+	"fmt"
+	"math/rand"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -10,14 +13,7 @@ import (
 	"github.com/tdycwym/edgex_admin/middleware/session"
 	"github.com/tdycwym/edgex_admin/resp"
 	"github.com/tdycwym/edgex_admin/utils"
-
-	"encoding/json"
-	"fmt"
-
-	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
-	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/errors"
-	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/profile"
-	sms "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/sms/v20190711"
+	"gopkg.in/gomail.v2"
 )
 
 type LoginParams struct {
@@ -77,6 +73,7 @@ func Login(c *gin.Context) *resp.JSONOutput {
 type RegisterParams struct {
 	Username string `form:"username" json:"username" binding:"required"`
 	Password string `form:"password" json:"password" binding:"required"`
+	Email    string `form:"email" json:"email" binding:"required"`
 }
 
 func Register(c *gin.Context) *resp.JSONOutput {
@@ -88,17 +85,23 @@ func Register(c *gin.Context) *resp.JSONOutput {
 		return resp.SampleJSON(c, resp.RespCodeParamsError, nil)
 	}
 
-	// Step2. 查看用户是否存在
+	// Step2. 查看用户/邮箱是否存在
 	userInfo, dbErr := dal.GetEdgexUserByName(params.Username)
+	// mailInfo, dbErr2 := dal.GetEdgexUserByEmail(params.Email)
 	if dbErr != nil {
 		logs.Error("[Register] get user failed: username=%s, err=%v", params.Username, dbErr)
 		return resp.SampleJSON(c, resp.RespDatabaseError, nil)
 	}
-	if userInfo != nil {
+	if dbErr2 != nil {
+		logs.Error("[Register] email [%s] already exists: err=%v", dbErr2)
+	}
+	if userInfo != nil && mailInfo != nil {
 		return resp.SampleJSON(c, resp.RespCodeUserExsit, nil)
 	}
 
-	// Step3. 添加用户
+	//Step3. 邮箱验证
+
+	// Step4. 添加用户
 	user := &dal.EdgexUser{
 		Username:     params.Username,
 		Password:     params.Password,
@@ -121,74 +124,66 @@ func Logout(c *gin.Context) *resp.JSONOutput {
 	return resp.SampleJSON(c, resp.RespCodeSuccess, nil)
 }
 
-func sendMessage(c *gin.Context) *resp.JSONOutput {
-	/* 必要步骤：
-	 * 实例化一个认证对象，入参需要传入腾讯云账户密钥对 secretId 和 secretKey
-	 * 本示例采用从环境变量读取的方式，需要预先在环境变量中设置这两个值
-	 * 您也可以直接在代码中写入密钥对，但需谨防泄露，不要将代码复制、上传或者分享给他人
-	 * CAM 密匙查询: https://console.cloud.tencent.com/cam/capi
-	 */
-	credential := common.NewCredential(
-		// os.Getenv("TENCENTCLOUD_SECRET_ID"),
-		// os.Getenv("TENCENTCLOUD_SECRET_KEY"),
-		"xxx",
-		"xxx",
-	)
-	/* 非必要步骤:
-	 * 实例化一个客户端配置对象，可以指定超时时间等配置 */
-	cpf := profile.NewClientProfile()
+type MailParam struct {
+	Email string `form:"email" json:"email" binding:"required"`
+}
 
-	/* SDK 默认使用 POST 方法
-	 * 如需使用 GET 方法，可以在此处设置，但 GET 方法无法处理较大的请求 */
-	cpf.HttpProfile.ReqMethod = "POST"
+func SendMailTo(mailTo []string, subject string, body string) error {
+	//定义邮箱服务器连接信息，如果是网易邮箱 pass填密码，qq邮箱填授权码
 
-	/* SDK 有默认的超时时间，非必要请不要进行调整
-	 * 如有需要请在代码中查阅以获取最新的默认值 */
-	//cpf.HttpProfile.ReqTimeout = 5
+	//mailConn := map[string]string{
+	//  "user": "xxx@163.com",
+	//  "pass": "your password",
+	//  "host": "smtp.163.com",
+	//  "port": "465",
+	//}
 
-	/* SDK 会自动指定域名，通常无需指定域名，但访问金融区的服务时必须手动指定域名
-	 * 例如 SMS 的上海金融区域名为 sms.ap-shanghai-fsi.tencentcloudapi.com */
-	cpf.HttpProfile.Endpoint = "sms.tencentcloudapi.com"
+	mailConn := map[string]string{
+		"user": "2369351080@qq.com",
+		"pass": "inkdesahnqrjdjeg",
+		"host": "smtp.qq.com",
+		"port": "465",
+	}
 
-	/* SDK 默认用 TC3-HMAC-SHA256 进行签名，非必要请不要修改该字段 */
-	cpf.SignMethod = "HmacSHA1"
+	port, _ := strconv.Atoi(mailConn["port"]) //转换端口类型为int
 
-	/* 实例化 SMS 的 client 对象
-	 * 第二个参数是地域信息，可以直接填写字符串 ap-guangzhou，或者引用预设的常量 */
-	client, _ := sms.NewClient(credential, "ap-guangzhou", cpf)
+	m := gomail.NewMessage()
 
-	/* 实例化一个请求对象，根据调用的接口和实际情况，可以进一步设置请求参数
-	* 您可以直接查询 SDK 源码确定接口有哪些属性可以设置
-	 * 属性可能是基本类型，也可能引用了另一个数据结构
-	 * 推荐使用 IDE 进行开发，可以方便地跳转查阅各个接口和数据结构的文档说明 */
-	request := sms.NewSendSmsRequest()
+	m.SetHeader("From", m.FormatAddress(mailConn["user"], "NJU-IOT-EDGEX验证")) //这种方式可以添加别名，即“XX官方”　 //说明：如果是用网易邮箱账号发送，以下方法别名可以是中文，如果是qq企业邮箱，以下方法用中文别名，会报错，需要用上面此方法转码
+	//m.SetHeader("From", "FB Sample"+"<"+mailConn["user"]+">") //这种方式可以添加别名，即“FB Sample”， 也可以直接用<code>m.SetHeader("From",mailConn["user"])</code> 读者可以自行实验下效果
+	//m.SetHeader("From", mailConn["user"])
+	m.SetHeader("To", mailTo...)    //发送给多个用户
+	m.SetHeader("Subject", subject) //设置邮件主题
+	m.SetBody("text/html", body)    //设置邮件正文
 
-	/* 基本类型的设置:
-	 * SDK 采用的是指针风格指定参数，即使对于基本类型也需要用指针来对参数赋值。
-	 * SDK 提供对基本类型的指针引用封装函数
-	 * 帮助链接：
-	 * 短信控制台：https://console.cloud.tencent.com/smsv2
-	 * sms helper：https://cloud.tencent.com/document/product/382/3773
-	 */
+	d := gomail.NewDialer(mailConn["host"], port, mailConn["user"], mailConn["pass"])
 
-	/* 短信应用 ID: 在 [短信控制台] 添加应用后生成的实际 SDKAppID，例如1400006666 */
-	request.SmsSdkAppid = common.StringPtr("1305849352")
+	err := d.DialAndSend(m)
+	fmt.Printf("%s", err)
+	return err
 
-	request.PhoneNumberSet = common.StringPtrs([]string{"+8618651886162", "+8613711333222", "+8613711144422"})
+}
 
-	// 通过 client 对象调用想要访问的接口，需要传入请求对象
-	response, err := client.SendSms(request)
-	// 处理异常
-	if _, ok := err.(*errors.TencentCloudSDKError); ok {
-		fmt.Printf("An API error has returned: %s", err)
+func SendMail(c *gin.Context) *resp.JSONOutput {
+	params := &MailParam{}
+	err := c.Bind(&params)
+	if err != nil {
+		logs.Error("[Register] request-params error: params=%+v, err=%v", params, err)
+		return resp.SampleJSON(c, resp.RespCodeParamsError, nil)
+	}
+	mailTo := []string{params.Email}
+	subject := string("登录验证")
+	code := randomCode()
+	body := code
+	err = SendMailTo(mailTo, subject, body)
+	if err != nil {
 		return resp.SampleJSON(c, resp.RespCodeParamsError, "发送失败")
 	}
-	// 非 SDK 异常，直接失败。实际代码中可以加入其他的处理
-	if err != nil {
-		panic(err)
-	}
-	b, _ := json.Marshal(response.Response)
-	// 打印返回的 JSON 字符串
-	fmt.Printf("%s", b)
 	return resp.SampleJSON(c, resp.RespCodeSuccess, nil)
+}
+
+func randomCode() string {
+	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
+	vcode := fmt.Sprintf("%06v", rnd.Int31n(1000000))
+	return vcode
 }
