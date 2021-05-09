@@ -265,7 +265,7 @@ type EntryptedParams struct {
 	Answer     string `form:"answer" json:"answer"`
 }
 
-func testUpdateUser(c *gin.Context) *resp.JSONOutput {
+func TestUpdateUser(c *gin.Context) *resp.JSONOutput {
 	params := &EntryptedParams{}
 	err := c.Bind(&params)
 	if err != nil {
