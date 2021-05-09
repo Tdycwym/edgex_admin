@@ -214,7 +214,7 @@ func SendMail(c *gin.Context) *resp.JSONOutput {
 	params := &MailParam{}
 	err := c.Bind(&params)
 	if err != nil {
-		logs.Error("[Register] request-params error: params=%+v, err=%v", params, err)
+		logs.Error("[SendMail] request-params error: params=%+v, err=%v", params, err)
 		return resp.SampleJSON(c, resp.RespCodeParamsError, nil)
 	}
 	mailTo := []string{params.Email}
@@ -259,7 +259,7 @@ func updateEntrypted(user_name string, entrypted string) error {
 	return err
 }
 
-func updatePassword(user_name string, password string) error {
+func updateassword(user_name string, password string) error {
 	var fieldsMap map[string]interface{} = map[string]interface{}{"password": password}
 	err := dal.UpdateEdgexUser(user_name, fieldsMap)
 	return err
@@ -280,7 +280,7 @@ func UpdateUserEntrypted(c *gin.Context) *resp.JSONOutput {
 	params := &EntryptedParams{}
 	err := c.Bind(&params)
 	if err != nil {
-		logs.Error("[Register] request-params error: params=%+v, err=%v", params, err)
+		logs.Error("[UpdateEntrypted] request-params error: params=%+v, err=%v", params, err)
 		return resp.SampleJSON(c, resp.RespCodeParamsError, nil)
 	}
 	entrypted := fmt.Sprintf("%d %s", params.QuestionId, params.Answer)
@@ -295,12 +295,47 @@ func UpdateUserPassword(c *gin.Context) *resp.JSONOutput {
 	params := &PasswordParams{}
 	err := c.Bind(&params)
 	if err != nil {
-		logs.Error("[Register] request-params error: params=%+v, err=%v", params, err)
+		logs.Error("[UpdatePassword] request-params error: params=%+v, err=%v", params, err)
 		return resp.SampleJSON(c, resp.RespCodeParamsError, nil)
 	}
 	password := params.Password
 	if updateEntrypted(params.UserName, password) != nil {
 		return resp.SampleJSON(c, resp.RespCodeParamsError, "更新失败")
 	}
+	return resp.SampleJSON(c, resp.RespCodeSuccess, nil)
+}
+
+func CheckUserEntrypted(c *gin.Context) *resp.JSONOutput {
+	params := &EntryptedParams{}
+	err := c.Bind(&params)
+	if err != nil {
+		logs.Error("[CheckEntrypted] request-params error: params=%+v, err=%v", params, err)
+		return resp.SampleJSON(c, resp.RespCodeParamsError, nil)
+	}
+
+	user_name := params.UserName
+	var (
+		userInfo *dal.EdgexUser
+		dbErr    error
+	)
+	userInfo, dbErr = dal.GetEdgexUserByName(user_name)
+	if dbErr != nil {
+		logs.Error("[CheckEntrypted] get userInfo failed: params=%+v, err=%v", params, err)
+		return resp.SampleJSON(c, resp.RespDatabaseError, nil)
+	}
+	if userInfo == nil {
+		logs.Error("[CheckEntrypted] user is Not Exsit: params=%+v, userInfo=%+v", params, userInfo)
+		return resp.SampleJSON(c, resp.RespCodeParamsError, nil)
+	}
+	if userInfo.Entrypted == "" {
+		logs.Error("[CheckEntrypted] entrypted Not Exist: params=%+v, userInfo=%+v", params, userInfo)
+		return resp.SampleJSON(c, resp.RespDatabaseError, "密保不存在")
+	}
+	entrypted := fmt.Sprintf("%d %s", params.QuestionId, params.Answer)
+	if userInfo.Entrypted != entrypted {
+		logs.Error("[CheckEntrypted] entrypted error: params=%+v, userInfo=%+v", params, userInfo)
+		return resp.SampleJSON(c, resp.RespDatabaseError, "密保错误")
+	}
+
 	return resp.SampleJSON(c, resp.RespCodeSuccess, nil)
 }
